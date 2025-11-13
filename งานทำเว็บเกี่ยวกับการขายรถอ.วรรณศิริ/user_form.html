@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Carsale | สมัครสมาชิก</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-blue-900 text-white shadow-md">
+    <div class="max-w-7xl mx-auto flex justify-between items-center p-4">
+      <div class="flex items-center space-x-3">
+        <img src="carsale.png" alt="Carsale Logo" class="w-10 h-10" />
+        <h1 class="text-2xl font-bold">Carsale</h1>
+      </div>
+      <nav class="space-x-6 text-lg font-medium">
+        <a href="index.html" class="bg-green-500 text-white px-6 py-3 rounded-full font-semibold shadow hover:bg-green-300">หน้าแรก</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Form Section -->
+  <main class="flex-1 py-16 px-4">
+    <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-8">
+      <h2 class="text-2xl font-bold text-center text-blue-800 mb-4">สมัครสมาชิกผู้ใช้ Carsale</h2>
+      <div id="message" class="text-center mb-4 font-medium"></div>
+
+      <form id="registerForm" class="space-y-6">
+        <!-- ข้อมูลพื้นฐาน -->
+        <div>
+          <label class="block font-medium mb-1">ชื่อ</label>
+          <input type="text" name="fname" required class="w-full border rounded-md px-4 py-2 focus:ring focus:ring-blue-300" />
+        </div>
+        <div>
+          <label class="block font-medium mb-1">นามสกุล</label>
+          <input type="text" name="lname" required class="w-full border rounded-md px-4 py-2" />
+        </div>
+        <div>
+          <label class="block font-medium mb-1">อีเมล (ใช้ล็อกอิน)</label>
+          <input type="email" name="email" required class="w-full border rounded-md px-4 py-2" />
+        </div>
+        <div>
+          <label class="block font-medium mb-1">รหัสผ่าน</label>
+          <input type="password" name="password" required minlength="6" class="w-full border rounded-md px-4 py-2" placeholder="อย่างน้อย 6 ตัวอักษร" />
+        </div>
+        <div>
+          <label class="block font-medium mb-1">ยืนยันรหัสผ่าน</label>
+          <input type="password" name="confirm_password" required class="w-full border rounded-md px-4 py-2" />
+        </div>
+
+        <!-- รายละเอียดเพิ่มเติม -->
+        <div>
+          <label class="block font-medium mb-1">เบอร์โทรศัพท์</label>
+          <input type="tel" name="phone" required class="w-full border rounded-md px-4 py-2" />
+        </div>
+        <div>
+          <label class="block font-medium mb-1">เพศ</label>
+          <select name="gender" required class="w-full border rounded-md px-4 py-2">
+            <option value="">-- เลือกเพศ --</option>
+            <option value="ชาย">ชาย</option>
+            <option value="หญิง">หญิง</option>
+            <option value="อื่น ๆ">อื่น ๆ</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-medium mb-1">วันเกิด</label>
+          <input type="date" name="birthdate" required class="w-full border rounded-md px-4 py-2" />
+        </div>
+        <div>
+          <label class="block font-medium mb-1">ที่อยู่</label>
+          <textarea name="address" rows="3" required class="w-full border rounded-md px-4 py-2"></textarea>
+        </div>
+
+        <fieldset class="border border-gray-300 rounded-md p-4">
+          <legend class="text-lg font-semibold mb-3 text-blue-700">ประเภทรถที่ชอบ (เลือกได้มากกว่า 1)</legend>
+          <p class="text-sm text-gray-600 mb-4">โปรดเลือกประเภทรถที่คุณสนใจมากที่สุด</p>
+          <div class="grid grid-cols-2 gap-4">
+            <label class="inline-flex items-center space-x-2">
+              <input type="checkbox" name="car_type" value="ซีดาน (Sedan)" class="form-checkbox h-5 w-5 text-blue-600" />
+              <span>ซีดาน (Sedan)</span>
+            </label>
+            <label class="inline-flex items-center space-x-2">
+              <input type="checkbox" name="car_type" value="SUV" class="form-checkbox h-5 w-5 text-blue-600" />
+              <span>SUV</span>
+            </label>
+            <label class="inline-flex items-center space-x-2">
+              <input type="checkbox" name="car_type" value="ปิกอัพ (Pickup)" class="form-checkbox h-5 w-5 text-blue-600" />
+              <span>ปิกอัพ (Pickup)</span>
+            </label>
+            <label class="inline-flex items-center space-x-2">
+              <input type="checkbox" name="car_type" value="แฮทช์แบ็ก (Hatchback)" class="form-checkbox h-5 w-5 text-blue-600" />
+              <span>แฮทช์แบ็ก (Hatchback)</span>
+            </label>
+            <label class="inline-flex items-center space-x-2">
+              <input type="checkbox" name="car_type" value="รถตู้ (Van)" class="form-checkbox h-5 w-5 text-blue-600" />
+              <span>รถตู้ (Van)</span>
+            </label>
+            <label class="inline-flex items-center space-x-2">
+              <input type="checkbox" name="car_type" value="คูเป้ (Coupe)" class="form-checkbox h-5 w-5 text-blue-600" />
+              <span>คูเป้ (Coupe)</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div class="text-center">
+          <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-full hover:bg-green-500">สมัครสมาชิก</button>
+        </div>
+      </form>
+
+      <div id="status" class="mt-4 text-center font-medium"></div>
+    </div>
+  </main>
+
+  <footer class="bg-blue-900 text-gray-100 py-6">
+    <div class="max-w-7xl mx-auto text-center">
+      <p>© 2025 Carsale | รถมือสองคุณภาพดี</p>
+    </div>
+  </footer>
+
+  <script>
+    const form = document.getElementById("registerForm");
+    const statusDiv = document.getElementById("status");
+    const messageDiv = document.getElementById("message");
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzTdljkfeVvbgwhzzSumuw5Z4dvlFEbPW5ASg6fp5gx7ufAo2Np18Q3PlviPOgcHo4I/exec"; // ต้องเป็น Apps Script ที่มี doPost รับ action=register
+
+    function show(text, success = true) {
+      messageDiv.textContent = text;
+      messageDiv.className = success ? "text-green-700 mb-4 font-medium" : "text-red-600 mb-4 font-medium";
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      statusDiv.textContent = "";
+      show("กำลังสมัคร...", true);
+
+      const fd = new FormData(form);
+      const password = fd.get("password");
+      const confirm = fd.get("confirm_password");
+
+      if (password !== confirm) {
+        show("รหัสผ่านไม่ตรงกัน", false);
+        return;
+      }
+      if (password.length < 6) {
+        show("รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร", false);
+        return;
+      }
+
+      // รวม checkbox
+      const carTypeNodes = document.querySelectorAll('input[name="car_type"]:checked');
+      const carTypes = Array.from(carTypeNodes).map(n => n.value);
+
+      const params = new URLSearchParams();
+      params.append("action", "register");
+      params.append("username", fd.get("email")); // ใช้อีเมลเป็น username
+      params.append("email", fd.get("email"));
+      params.append("password", password);
+      params.append("fname", fd.get("fname"));
+      params.append("lname", fd.get("lname"));
+      params.append("phone", fd.get("phone"));
+      params.append("gender", fd.get("gender"));
+      params.append("birthdate", fd.get("birthdate"));
+      params.append("address", fd.get("address"));
+      carTypes.forEach(ct => params.append("car_type", ct));
+
+      try {
+        const res = await fetch(WEB_APP_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+          body: params.toString()
+        });
+        const data = await res.json();
+        if (data.status === "success") {
+          show("สมัครสมาชิกสำเร็จ! สามารถล็อกอินได้", true);
+          form.reset();
+        } else {
+          show(data.message || "สมัครสมาชิกล้มเหลว", false);
+        }
+      } catch (err) {
+        show("เกิดข้อผิดพลาด: " + err.message, false);
+      }
+    });
+  </script>
+
+</body>
+</html>

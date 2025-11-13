@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carsale | ตะกร้าสินค้า</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-blue-900 text-white shadow-md">
+    <div class="max-w-7xl mx-auto flex justify-between items-center p-4">
+      <h1 class="text-2xl font-bold">🛒 ตะกร้าสินค้า</h1>
+      <a href="carsale.html" class="bg-green-500 text-white px-6 py-2 rounded-full shadow hover:bg-green-400">กลับไปเลือกซื้อ</a>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="flex-1 max-w-4xl mx-auto p-6">
+    <h2 class="text-3xl font-bold text-blue-800 mb-6">สินค้าที่เลือก</h2>
+    <div id="cartList" class="bg-white rounded-lg shadow p-6"></div>
+
+    <div class="mt-6 flex justify-end">
+      <button onclick="goCheckout()" class="bg-yellow-400 text-gray-900 px-6 py-3 rounded-full font-semibold shadow hover:bg-yellow-300">
+        ดำเนินการชำระเงิน
+      </button>
+    </div>
+  </main>
+
+  <script>
+    function renderCart() {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      if (cart.length === 0) {
+        document.getElementById('cartList').innerHTML = "<p class='text-gray-600'>ตะกร้าว่าง</p>";
+        return;
+      }
+
+      let html = "";
+      let total = 0;
+
+      cart.forEach((item, index) => {
+        const priceFmt = item.price.toLocaleString('th-TH');
+        total += item.price;
+        html += `
+          <div class="border-b py-4 flex justify-between items-center">
+            <div>
+              <h3 class="text-lg font-semibold">${item.model} (${item.year})</h3>
+              <p class="text-gray-600">${item.trans} | ${item.fuel}</p>
+              <p class="text-blue-700 font-bold">฿${priceFmt}</p>
+            </div>
+            <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700">ลบ</button>
+          </div>
+        `;
+      });
+
+      document.getElementById('cartList').innerHTML = html + `
+        <p class="mt-4 text-xl font-bold text-right text-red-600">รวมทั้งหมด: ฿${total.toLocaleString('th-TH')}</p>
+      `;
+    }
+
+    function removeFromCart(index) {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      cart.splice(index, 1);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      renderCart();
+    }
+
+    function goCheckout() {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      if (cart.length === 0) {
+        alert("ไม่มีสินค้าในตะกร้า");
+        return;
+      }
+      localStorage.setItem('checkout', JSON.stringify(cart));
+      window.location.href = "checkout.html";
+    }
+
+    renderCart();
+  </script>
+
+</body>
+</html>

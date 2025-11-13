@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carsale | รายการรถมือสอง</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="description" content="รายการรถมือสอง 6 คันจาก Carsale ค้นหาแล้วแสดงเฉพาะรุ่นที่ต้องการ" />
+</head>
+<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-blue-900 text-white shadow-md">
+    <div class="max-w-7xl mx-auto flex justify-between items-center p-4">
+      <div class="flex items-center space-x-3">
+        <img src="carsale.png" alt="Carsale Logo" class="w-10 h-10" />
+        <h1 class="text-2xl font-bold">Carsale</h1>
+      </div>
+      <!-- ลิงก์เมนู -->
+      <nav class="flex gap-4">
+        <a href="index.html" class="bg-green-500 text-white px-6 py-3 rounded-full font-semibold shadow hover:bg-green-400">หน้าแรก</a>
+        <a href="cart.html" class="bg-yellow-400 text-gray-900 px-6 py-3 rounded-full font-semibold shadow hover:bg-yellow-300">🛒 ตะกร้าสินค้า</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Search Bar -->
+  <section class="w-full bg-white shadow-sm border-b border-gray-200">
+    <div class="max-w-3xl mx-auto px-4 py-6">
+      <form id="searchForm" class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-end" autocomplete="off">
+        <div class="flex-1">
+          <label for="q" class="block text-sm font-medium text-gray-700 mb-1">ค้นหารุ่น / ยี่ห้อ</label>
+          <input id="q" name="q" type="text" placeholder="เช่น Civic, Vios, Fortuner" class="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 px-3 py-2" />
+        </div>
+        <div class="sm:w-auto">
+          <button type="submit" class="w-full sm:w-auto bg-blue-600 text-white px-6 py-2 rounded-full font-semibold shadow hover:bg-blue-700">ค้นหา</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- Results Grid -->
+  <main id="results" class="flex-1 w-full py-12">
+    <div class="max-w-7xl mx-auto px-4">
+      <h2 class="text-3xl font-bold text-blue-800 mb-8 text-center">รายการรถทั้งหมด</h2>
+      <p id="noResults" class="hidden text-center text-gray-600 mb-8">ไม่พบรถตามคำค้นหา</p>
+      <div id="carGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-blue-900 text-gray-100 py-6 mt-auto">
+    <div class="max-w-7xl mx-auto text-center">
+      <p>© 2025 Carsale | รถมือสองคุณภาพดี</p>
+    </div>
+  </footer>
+
+  <!-- Script -->
+  <script>
+    const CAR_DATA = [
+      { id: 'vios-2018', model: 'Toyota Vios 1.5E', year: 2018, brand: 'Toyota', odo: 85000, trans: 'เกียร์อัตโนมัติ', fuel: 'เบนซิน', price: 350000, img: 'vios.jpg' },
+      { id: 'civic-2019', model: 'Honda Civic 1.8EL', year: 2019, brand: 'Honda', odo: 60000, trans: 'เกียร์อัตโนมัติ', fuel: 'เบนซิน', price: 520000, img: 'civic.jpg' },
+      { id: 'mazda2-2020', model: 'Mazda 2 Skyactiv', year: 2020, brand: 'Mazda', odo: 40000, trans: 'เกียร์อัตโนมัติ', fuel: 'ดีเซล', price: 480000, img: 'mazda2.jpg' },
+      { id: 'dmax-2021', model: 'Isuzu D-Max Hi-Lander', year: 2021, brand: 'Isuzu', odo: 55000, trans: 'เกียร์ธรรมดา', fuel: 'ดีเซล', price: 690000, img: 'dmax.jpg' },
+      { id: 'almera-2022', model: 'Nissan Almera Turbo', year: 2022, brand: 'Nissan', odo: 25000, trans: 'เกียร์อัตโนมัติ', fuel: 'เบนซิน', price: 420000, img: 'almera.jpg' },
+      { id: 'fortuner-2019', model: 'Toyota Fortuner 2.8V 4WD', year: 2019, brand: 'Toyota', odo: 90000, trans: 'เกียร์อัตโนมัติ', fuel: 'ดีเซล', price: 1050000, img: 'fortuner.jpg' }
+    ];
+
+    const carGridEl = document.getElementById('carGrid');
+    const noResultsEl = document.getElementById('noResults');
+    const searchForm = document.getElementById('searchForm');
+    const searchInput = document.getElementById('q');
+
+    function escapeHTML(text) {
+      return text.replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+    }
+
+    // ✅ Card รถที่มีปุ่มแยกกัน
+    function carCardTemplate(car) {
+      const priceFmt = car.price.toLocaleString('th-TH');
+      const odoFmt = car.odo.toLocaleString('th-TH');
+      const modelEscaped = escapeHTML(`${car.model} ${car.year}`);
+      return `
+        <article class="bg-white rounded-lg shadow hover:shadow-lg transition overflow-hidden"
+          data-id="${car.id}">
+          <img src="${car.img}" alt="${modelEscaped}" loading="lazy" class="w-full h-48 object-cover" />
+          <div class="p-4">
+            <h3 class="text-xl font-semibold mb-1">${modelEscaped}</h3>
+            <p class="text-gray-600 text-sm mb-2">วิ่ง ${odoFmt} กม. | ${car.trans} | ${car.fuel}</p>
+            <p class="text-blue-700 font-bold text-lg mb-4">฿${priceFmt}</p>
+            
+            <div class="flex gap-2">
+              <button class="flex-1 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                onclick="addToCart('${car.id}')">เพิ่มในตะกร้า</button>
+              <button class="flex-1 bg-yellow-400 text-gray-900 px-4 py-2 rounded hover:bg-yellow-300"
+                onclick="buyNow('${car.id}')">ซื้อเลย</button>
+            </div>
+          </div>
+        </article>`;
+    }
+
+    function renderCars(list) {
+      carGridEl.innerHTML = list.map(carCardTemplate).join('');
+      noResultsEl.classList.toggle('hidden', list.length !== 0);
+    }
+
+    function filterCars(query) {
+      if (!query) return CAR_DATA;
+      const q = query.trim().toLowerCase();
+      return CAR_DATA.filter(car =>
+        car.model.toLowerCase().includes(q) ||
+        car.brand.toLowerCase().includes(q) ||
+        String(car.year).includes(q)
+      );
+    }
+
+    searchForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const q = searchInput.value;
+      const result = filterCars(q);
+      renderCars(result);
+      document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    searchInput.addEventListener('input', function () {
+      const result = filterCars(this.value);
+      renderCars(result);
+    });
+
+    renderCars(CAR_DATA);
+
+    // ✅ ฟังก์ชันเพิ่มลงตะกร้า และ ซื้อเลย
+    function addToCart(id) {
+      const car = CAR_DATA.find(c => c.id === id);
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      cart.push(car);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      window.location.href = "cart.html"; // ไปหน้าตะกร้า
+    }
+
+    function buyNow(id) {
+      const car = CAR_DATA.find(c => c.id === id);
+      localStorage.setItem('checkout', JSON.stringify(car));
+      window.location.href = "checkout.html"; // ไปหน้าซื้อ
+    }
+  </script>
+</body>
+<style>
+  html { scroll-behavior: smooth; }
+</style>
+<script>
+  function carCardTemplate(car) {
+    const priceFmt = car.price.toLocaleString('th-TH');
+    const odoFmt = car.odo.toLocaleString('th-TH');
+    return `
+      <article class="bg-white rounded-lg shadow hover:shadow-lg transition overflow-hidden"
+        data-id="${car.id}">
+        <img src="${car.img}" alt="${car.model}" loading="lazy" class="w-full h-48 object-cover" />
+        <div class="p-4">
+          <h3 class="text-xl font-semibold mb-1">${car.model} (${car.year})</h3>
+          <p class="text-gray-600 text-sm mb-2">วิ่ง ${odoFmt} กม. | ${car.trans} | ${car.fuel}</p>
+          <p class="text-blue-700 font-bold text-lg mb-4">฿${priceFmt}</p>
+          <div class="space-x-2">
+            <button onclick="buyNow('${car.id}')" 
+              class="bg-yellow-400 text-gray-900 px-4 py-2 rounded hover:bg-yellow-300">
+              ซื้อเลย
+            </button>
+            <button onclick="addToCart('${car.id}')" 
+              class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+              เพิ่มในตะกร้า
+            </button>
+          </div>
+        </div>
+      </article>
+    `;
+  }
+
+  // ซื้อเลย (สินค้าเดียว)
+  function buyNow(id) {
+    const car = CAR_DATA.find(c => c.id === id);
+    localStorage.setItem("checkout", JSON.stringify([car])); // เก็บ array แต่มี 1 ชิ้น
+    window.location.href = "checkout.html";
+  }
+
+  // เพิ่มในตะกร้า (หลายสินค้าได้)
+  function addToCart(id) {
+    const car = CAR_DATA.find(c => c.id === id);
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    cart.push(car);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    window.location.href = "cart.html";
+  }
+</script>
+
+</html>

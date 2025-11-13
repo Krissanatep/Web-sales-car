@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carsale | ซื้อสินค้า</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-blue-900 text-white shadow-md">
+    <div class="max-w-7xl mx-auto flex justify-between items-center p-4">
+      <h1 class="text-2xl font-bold">🚗 ซื้อสินค้า</h1>
+      <a href="carsale.html" class="bg-green-500 text-white px-6 py-2 rounded-full shadow hover:bg-green-400">กลับไปเลือกซื้อ</a>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="flex-1 max-w-3xl mx-auto p-6">
+    <h2 class="text-3xl font-bold text-blue-800 mb-6">รายละเอียดการสั่งซื้อ</h2>
+    <div id="checkoutItem" class="bg-white rounded-lg shadow p-6"></div>
+
+    <form id="orderForm" class="mt-6 space-y-4">
+      <div>
+        <label class="block mb-1 font-medium">ชื่อผู้ซื้อ</label>
+        <input type="text" class="w-full border px-3 py-2 rounded" required>
+      </div>
+      <div>
+        <label class="block mb-1 font-medium">เบอร์ติดต่อ</label>
+        <input type="tel" class="w-full border px-3 py-2 rounded" required>
+      </div>
+
+      <!-- เลือกวิธีรับสินค้า -->
+      <div>
+        <label class="block mb-1 font-medium">วิธีรับสินค้า</label>
+        <div class="space-y-2">
+          <label class="flex items-center space-x-2">
+            <input type="radio" name="delivery" value="pickup" class="w-4 h-4" checked>
+            <span>รับเองที่สาขา</span>
+          </label>
+          <label class="flex items-start space-x-2">
+            <input type="radio" name="delivery" value="shipping" class="w-4 h-4">
+            <span>จัดส่ง
+              <textarea id="addressField" class="hidden w-full border px-3 py-2 rounded mt-2" placeholder="กรอกที่อยู่จัดส่ง"></textarea>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <button type="submit" class="w-full bg-yellow-400 text-gray-900 px-6 py-3 rounded-full font-semibold shadow hover:bg-yellow-300">
+        ยืนยันการสั่งซื้อ
+      </button>
+    </form>
+  </main>
+
+  <script>
+    function renderCheckout() {
+      const items = JSON.parse(localStorage.getItem('checkout'));
+      if (!items || items.length === 0) {
+        document.getElementById('checkoutItem').innerHTML = "<p class='text-gray-600'>ไม่พบสินค้าที่เลือก</p>";
+        return;
+      }
+
+      let html = "";
+      let total = 0;
+
+      items.forEach(item => {
+        const priceFmt = item.price.toLocaleString('th-TH');
+        total += item.price;
+        html += `
+          <div class="border-b py-2">
+            <h3 class="font-semibold">${item.model} (${item.year})</h3>
+            <p class="text-gray-600 text-sm">${item.trans} | ${item.fuel}</p>
+            <p class="text-blue-700 font-bold">฿${priceFmt}</p>
+          </div>
+        `;
+      });
+
+      document.getElementById('checkoutItem').innerHTML = html + `
+        <p class="mt-4 text-xl font-bold text-right text-red-600">รวมทั้งหมด: ฿${total.toLocaleString('th-TH')}</p>
+      `;
+    }
+
+    // toggle textarea ที่อยู่
+    document.addEventListener("change", function(e) {
+      if (e.target.name === "delivery") {
+        const addressField = document.getElementById("addressField");
+        if (e.target.value === "shipping") {
+          addressField.classList.remove("hidden");
+        } else {
+          addressField.classList.add("hidden");
+        }
+      }
+    });
+
+    // submit ฟอร์ม
+    document.getElementById("orderForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      console.log("form submitted"); // ✅ debug
+
+      const name = e.target[0].value;
+      const phone = e.target[1].value;
+      const delivery = document.querySelector('input[name="delivery"]:checked').value;
+      const address = document.getElementById("addressField").value;
+
+      const items = JSON.parse(localStorage.getItem("checkout")) || [];
+      const total = items.reduce((sum, item) => sum + item.price, 0);
+
+      console.log("Sending data to Google Script..."); // ✅ debug
+
+      fetch("https://script.google.com/macros/s/AKfycbzFCe38s-s_CYmpKkqRW_IJLxRLE8PDKU-amVqmbQjICFp-6mLRricDzWg_xo6hVLL8/exec", {
+        method: "POST",
+        body: JSON.stringify({
+          name,
+          phone,
+          delivery,
+          address,
+          items: items.map(i => `${i.model} (${i.year}) - ${i.price}`),
+          total
+        }),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
+      .then(res => {
+        console.log("Raw response:", res);
+        return res.json();
+      })
+      .then(data => {
+        console.log("Parsed response:", data);
+        if (data.status === "success") {
+          alert("ทำการสั่งซื้อเรียบร้อยแล้ว!");
+          localStorage.removeItem("checkout");
+          window.location.href = "carsale.html";
+        } else {
+          alert("บันทึกข้อมูลไม่สำเร็จ: " + data.message);
+        }
+      })
+      .catch(err => {
+        console.error("Fetch error:", err);
+        alert("บันทึกข้อมูลไม่สำเร็จ!");
+      });
+    });
+
+    renderCheckout();
+  </script>
+
+</body>
+</html>
